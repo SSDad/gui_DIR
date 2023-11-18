@@ -1,0 +1,89 @@
+function [hSubPanel, hAxis, hSlider] = addComp2Panel_View(hPanel)
+
+FC = [255 255 102]/255;
+
+%% sag, cor, sag+cor
+gl = uigridlayout(hPanel, [2 2]);
+gl.RowHeight = {'1x','1x'};
+gl.ColumnWidth = {'1x','1x'};
+
+for n = 1:2
+    for m = 1:2
+        k = m+(n-1)*2;
+        hSubPanel(k) = uipanel(gl);
+        hSubPanel(k).Layout.Row = n;
+        hSubPanel(k).Layout.Column = m;
+        % subPanel(k).Title = 'Sag';
+        hSubPanel(k).BackgroundColor = 'k';
+
+        sgl = uigridlayout(hSubPanel(k), [2 1]);
+        sgl.RowHeight = {'1x', 40};
+
+        hAxis(k) = uiaxes(sgl);
+        hSlider(k) = uislider(sgl,...
+                            'ValueChangedFcn', @Callback_Slider_ViewPanel_1);
+
+    end
+end
+
+linkaxes(hAxis);
+
+% x = [0 0.5 0];
+% y = [0.5 0.5 0];
+% w = [.5 .5 1];
+% h = .5;
+% 
+% sphc = 'b';
+% TT{1} = 'Sagittal';
+% TT{2} = 'Coronal';
+% TT{3} = 'Sag+Cor';
+% for n = 1:3
+%     subPanel(n).hPanel = uipanel('parent', hPanel,...
+%                             'Unit', 'Normalized',...
+%                             'Position', [x(n) y(n) w(n) h], ...
+%                             'Title', TT{n}, ...
+%                             'FontSize',                 12,...
+%                             'Units',                     'normalized', ...
+%                             'visible',                      'on', ...
+%                             'ForegroundColor',       'c',...
+%                             'BackgroundColor',       'k', ...
+%                             'HighlightColor',          'c',...
+%                             'ShadowColor',            'k', ...
+%                             'Tag', num2str(n));
+% 
+%     xx = [.9 0 0 .9];
+%     yy = [.9 .9 0 0 ];
+%     ww = [.1 .9 .9 .1];
+%     hh = [.1 .1 .9 .9];
+%     for m = 1:4
+%         subPanel(n).ssPanel(m).hPanel = uipanel('parent', subPanel(n).hPanel,...
+%                             'Unit', 'Normalized',...
+%                             'Position', [xx(m) yy(m) ww(m) hh(m)], ...
+%                             'Title', '',...
+%                             'FontSize',                 12,...
+%                             'Units',                     'normalized', ...
+%                             'visible',                      'on', ...
+%                             'ForegroundColor',       'k',...
+%                             'BackgroundColor',       'k', ...
+%                             'HighlightColor',          sphc,...
+%                             'ShadowColor',            'k');
+%     end
+%     subPanel(n).ssPanel(4).Comp =...
+%              addComponents2Panel_Cine_SliceSlider(subPanel(n).ssPanel(4).hPanel, n);
+%     subPanel(n).ssPanel(2).Comp =...
+%              addComponents2Panel_Cine_ContrastBar(subPanel(n).ssPanel(2).hPanel, n);
+%     subPanel(n).ssPanel(1).Comp =...
+%              addComponents2Panel_Cine_ZoomButton(subPanel(n).ssPanel(1).hPanel, n);
+% 
+%     if n == 3
+%         subPanel(n).ssPanel(3).Comp =...
+%              addComponents2Panel_CineSC_View(subPanel(n).ssPanel(3).hPanel);
+%     else
+%         subPanel(n).ssPanel(3).Comp =...
+%              addComponents2Panel_View(subPanel(n).ssPanel(3).hPanel);
+%     end
+% end
+% hCineAxis(1) = subPanel(1).ssPanel(3).Comp.hAxis.Image;
+% hCineAxis(2) = subPanel(2).ssPanel(3).Comp.hAxis.Image;
+% hCineAxis(3) = subPanel(3).ssPanel(3).Comp.hAxis(1).Image;
+% hCineAxis(4) = subPanel(3).ssPanel(3).Comp.hAxis(2).Image;
