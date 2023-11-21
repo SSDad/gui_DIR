@@ -1,91 +1,87 @@
-function Callback_Pushbutton_MenuPanel_Load2DCine(src, evnt)
+function Callback_Pushbutton_MenuPanel_DIRExample(src, evnt)
 
 hFig = ancestor(src, 'Figure');
 gData = guidata(hFig);
 
-%% load cine data
-td = tempdir;
-fd_info = fullfile(td, 'DIR');
-ffn_info = fullfile(fd_info, 'info_DIR.mat');
-if ~exist(fd_info, 'dir')
-    mkdir(fd_info);
-end
+%% DIR
+fixedImg = imread("hands1.jpg");
+fixed = im2gray(fixedImg);
+movingImg = imread("hands2.jpg");
+moving = im2gray(movingImg);
 
-if ~exist(ffn_info, 'file')
-    [dcmPath] = uigetdir();
-    save(ffn_info, '*Path');
-else
-    load(ffn_info);
-    [dcmPath] = uigetdir(fileparts(dcmPath));
-end
 
-% gData.FileInfo.dcmPath = dcmPath;
-% gData.FileInfo.matPath = matPath;
 
-[matPath, dcmFolder] = fileparts(dcmPath);
-ffn_mat = fullfile(matPath, [dcmFolder, '.mat']);
+%% view
 
-if ~exist(ffn_mat, 'file')
-    [cineData] = fun_readCineDicom(dcmPath, ffn_mat);
-else
-    load(ffn_mat);
-end
+RA = imref2d(size(fixed), [0 30], [0 20]);
+% [mm, nn] = size(fixed);
+% RA = imref2d(size(fixed), [0 nn+1], [0 mm+1]);
 
-gData.cineData = cineData;
+hWB = waitbar(0.1, 'Loading images..');
+pause(1)
 
-%% cine view
-[nImg, mImg, nSlice] = size(cineData.v);
-x0 = cineData.IMP(1);
-y0 = cineData.IMP(2);
-dx = cineData.PS(1);
-dy = cineData.PS(2);
-xWL(1) = x0-dx/2;
-xWL(2) = xWL(1)+dx*nImg;
-yWL(1) = y0-dy/2;
-yWL(2) = yWL(1)+dy*mImg;
-RA = imref2d([mImg nImg], xWL, yWL);
-gData.Panel.View.RA(1) = RA;
-
-dy = RA.PixelExtentInWorldX;
-dy = RA.PixelExtentInWorldY;
-RAGrid.xx = RA.XWorldLimits(1)+dx/2:dx:RA.XWorldLimits(2)-dx/2;
-RAGrid.yy = RA.YWorldLimits(1)+dy/2:dy:RA.YWorldLimits(2)-dy/2;
-gData.Panel.View.RAGrid = RAGrid;
-
-iSlice = 1;
-% axis and image
 hA = gData.Panel.View.hAxis(1);
 cla(hA)
-I = cineData.v(:, :, iSlice);
-gData.Panel.View.hImage(1) = imshow(I, RA, [], 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy');
+gData.Panel.View.hImage(1) = imshow(fixed, RA, 'parent', hA);
+axis(hA, 'tight', 'equal', 'xy', 'on');
 hold(hA, "on");
 
-hA = gData.Panel.View.hAxis(2);
-cla(hA)
-J = cineData.v(:, :, iSlice+gData.SliceD);
-gData.Panel.View.hImage(2) = imshow(J, RA, [], 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy');
-hold(hA, "on");
-gData.Panel.View.hQV(2) = quiver(hA, [], [], [], [], 'g');
+hA2 = gData.Panel.View.hAxis(2);
+cla(hA2)
+gData.Panel.View.hImage(2) = imshow(moving, RA, 'parent', hA2);
+axis(hA2, 'tight', 'equal', 'xy', 'on');
+hold(hA2, "on");
+
+waitbar(0.5, hWB, 'Registering...');
+[dispField, reg] = imregdeform(moving, fixed, NumPyramidLevels=6, GridRegularization=0.6, DisplayProgress=0);
 
 hA = gData.Panel.View.hAxis(3);
 cla(hA)
-% K = cineData.v(:, :, iSlice);
-% gData.Panel.View.hImage(3) = imshow(K, RA, [], 'parent', hA);
+gData.Panel.View.hImage(3) = imshowpair(fixed, RA, reg, RA, 'parent', hA);
+axis(hA, 'tight', 'equal', 'xy', 'on');
+hold(hA, "on");
+
+hA4 = gData.Panel.View.hAxis(4);
+cla(hA4)
+gData.Panel.View.hImage(4) = imshowpair(fixed, RA, moving, RA,  'parent', hA4);
+axis(hA4, 'tight', 'equal', 'xy', 'on');
+hold(hA4, "on");
+
+
+s = 16;
+dx = RA.PixelExtentInWorldX;
+dy = RA.PixelExtentInWorldY;
+xx = RA.XWorldLimits(1)+dx/2:dx:RA.XWorldLimits(2)-dx/2;
+yy = RA.YWorldLimits(1)+dy/2:dy:RA.YWorldLimits(2)-dy/2;
+xx = xx(1:s:end);
+yy = yy(1:s:end);
+[xg, yg] = meshgrid(xx, yy);
+
+U = dispField(:,:,1)*dy;
+V = dispField(:,:,2)*dx;
+U = U(1:s:end, 1:s:end);
+V = V(1:s:end, 1:s:end);
+
+waitbar(0.9, hWB, 'Drawing displacement field map...');
+pause(1)
+quiver(hA4, xg+U, yg+V, -U, -V, 'r', 'AutoScale', 'off');
+plot(xg+U, yg+V, 'g.', 'MarkerSize', 6, 'parent', hA4)
+
+waitbar(1, hWB, 'Done...');
+pause(1)
+close(hWB)
+
+
+% 
+% 
+% hA = gData.Panel.View.hAxis(2);
+% gData.Panel.View.Image(2) = imshow(flipud(img_moving), RA, [], 'parent', hA);
 % axis(hA, 'tight', 'equal', 'xy');
-% hold(hA, "on")
+% 
+% hA = gData.Panel.View.hAxis(3);
+% gData.Panel.View.Image(3) = imshow(flipud(img_reg), RA, [], 'parent', hA);
+% axis(hA, 'tight', 'equal', 'xy');
 
-hA = gData.Panel.View.hAxis(4);
-cla(hA)
-
-% slider
-hSS =  gData.Panel.View.hSlider(1);
-hSS.Limits = [1 nSlice];
-hSS.Value = iSlice;
-hSS.Visible = 'on';
-
-guidata(hFig, gData);
 
 
 % allFileList = dir(fullfile(matPath, '*.mat'));

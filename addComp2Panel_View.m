@@ -21,6 +21,7 @@ for n = 1:2
 
         hAxis(k) = uiaxes(sgl);
         hSlider(k) = uislider(sgl,...
+                            'Visible', 'off', ...        
                             'ValueChangedFcn', @Callback_Slider_ViewPanel_1);
 
     end
