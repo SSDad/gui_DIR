@@ -16,7 +16,7 @@ if ~exist(ffn_info, 'file')
     save(ffn_info, '*Path');
 else
     load(ffn_info);
-    [dcmPath] = uigetdir(dcmPath);
+    [dcmPath] = uigetdir(fileparts(dcmPath));
 end
 
 % gData.FileInfo.dcmPath = dcmPath;
@@ -44,36 +44,35 @@ xWL(2) = xWL(1)+dx*nImg;
 yWL(1) = y0-dy/2;
 yWL(2) = yWL(1)+dy*mImg;
 RA = imref2d([mImg nImg], xWL, yWL);
+gData.Panel.View.RA(1) = RA;
 
- gData.Panel.View.RA(1) = RA;
+dy = RA.PixelExtentInWorldX;
+dy = RA.PixelExtentInWorldY;
+RAGrid.xx = RA.XWorldLimits(1)+dx/2:dx:RA.XWorldLimits(2)-dx/2;
+RAGrid.yy = RA.YWorldLimits(1)+dy/2:dy:RA.YWorldLimits(2)-dy/2;
+gData.Panel.View.RAGrid = RAGrid;
 
 iSlice = 1;
 % axis and image
-hA = gData.Panel.View.hAxis(1);
-I = cineData.v(:, :, iSlice);
-% I = flipud(I);
-gData.Panel.View.hImage(1) = imshow(I, RA, [], 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy');
-hold(hA, )
 
-hA = gData.Panel.View.hAxis(2);
-J = cineData.v(:, :, iSlice+gData.SliceD);
-% J = flipud(J);
-gData.Panel.View.hImage(2) = imshow(J, RA, [], 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy', 'hold');
+I{1} = cineData.v(:, :, iSlice);
+I{2} = cineData.v(:, :, iSlice+gData.SliceD);
+I{3} 
 
-hA = gData.Panel.View.hAxis(3);
-K = cineData.v(:, :, iSlice);
-% K = flipud(K);
-gData.Panel.View.hImage(3) = imshow(K, RA, [], 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy', 'hold');
-
-gData.Panel.View.hQV(3) = quiver(hA, [], [], [], []);
+for iA = 1:4
+    hA(iA) = gData.Panel.View.hAxis(1);
+    cla(hA(iA))
+    gData.Panel.View.hImage(iA) = imshow(I{iA}, RA, [], 'parent', hA(iA));
+    axis(hA(iA), 'tight', 'equal', 'xy');
+    hold(hA(iA), "on");
+    gData.Panel.View.hQV(iA) = quiver(hA(iA), [], [], [], [], 'g');
+end
 
 % slider
 hSS =  gData.Panel.View.hSlider(1);
 hSS.Limits = [1 nSlice];
 hSS.Value = iSlice;
+hSS.Visible = 'on';
 
 guidata(hFig, gData);
 

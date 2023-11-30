@@ -1,4 +1,4 @@
-function [hSubPanel, hAxis] = addComp2Panel_View(hPanel)
+function [hSubPanel, hAxis, hSlider] = addComp2Panel_View(hPanel)
 
 FC = [255 255 102]/255;
 
@@ -15,16 +15,20 @@ for n = 1:2
         hSubPanel(k).Layout.Column = m;
         % subPanel(k).Title = 'Sag';
         hSubPanel(k).BackgroundColor = 'k';
+
+        sgl = uigridlayout(hSubPanel(k), [3 1]);
+        sgl.RowHeight = {'1x', 40};
+
+        hAxis(k) = uiaxes(sgl);
+        hAxis(k).Title.String = '';
+        hSlider(k) = uislider(sgl,...
+                            'Visible', 'off', ...        
+                            'ValueChangedFcn', @Callback_Slider_ViewPanel_1);
+
     end
 end
 
-
-sgl = uigridlayout(hSubPanel(1), [2 1]);
-sgl.RowHeight = {'1x', 40};
-
-hAxis(1) = uiaxes(sgl);
-hSlider(1) = uislider(sgl);
-
+linkaxes(hAxis);
 
 % x = [0 0.5 0];
 % y = [0.5 0.5 0];

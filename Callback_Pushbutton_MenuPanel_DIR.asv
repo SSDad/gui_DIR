@@ -9,28 +9,30 @@ img_fixed = gData.cineData.v(:,:,iSlice);
 img_moving = gData.cineData.v(:,:,iSlice+gData.SliceD);
 
 [dispField, img_reg]=imregdeform(img_moving, img_fixed);
-
-
-%% view
-
-% gData.Panel.View.Image(2).CData = flipud(img_moving);
 gData.Panel.View.hImage(3).CData = img_reg;
 
+gData.Panel.View.hImage(4).CData = img_moving;
+
 RA = gData.Panel.View.RA(1);
-
-xx = linspace(RA.XWorldLimits(1), RA.XWorldLimits(2), RA.ImageSize(2));
-yy = linspace(RA.YWorldLimits(1), RA.YWorldLimits(2), RA.ImageSize(1));
-
+xx = gData.Panel.View.RAGrid.xx;
+yy = gData.Panel.View.RAGrid.yy;
+s = 4;
+xx = xx(1:s:end);
+yy = yy(1:s:end);
 [xg, yg] = meshgrid(xx, yy);
-hAx = gData.Panel.View.hAxis(2);
-hold(hAx, 'on')
 
 U = dispField(:,:,1);
 V = dispField(:,:,2);
+U = U(1:s:end, 1:s:end);
+V = V(1:s:end, 1:s:end);
 
-s = 4;
+hQV = gData.Panel.View.hQV(4);
+set(hQV, 'XData', xg+U, 'YData', yg+V, 'UData', -U, 'VData', -V);
 
-hQV = quiver(hAx, xg, yg, );
+guidata(hFig, gData);
+
+% quiver(hA4, xg+U, yg+V, -U, -V, 'r', 'AutoScale', 'off');
+
 
 % 
 % 

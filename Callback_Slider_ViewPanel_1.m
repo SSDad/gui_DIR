@@ -4,11 +4,25 @@ hFig = ancestor(src, 'Figure');
 gData = guidata(hFig);
 
 iSlice = round(src.Value);
+gData.iSlice = iSlice;
+
 I = gData.cineData.v(:,:,iSlice);
 gData.Panel.View.hImage(1).CData = I;
+gData.Panel.View.hAxis(1).Title.String = ['slice - ', num2str(gData.iSlice)];
 
 J = gData.cineData.v(:,:,iSlice+gData.SliceD);
 gData.Panel.View.hImage(2).CData = J;
+gData.Panel.View.hAxis(2).Title.String = ['slice - ', num2str(gData.iSlice+gData.SliceD)];;
+
+gData.Panel.View.hImage(3).CData = I;
+gData.Panel.View.hAxis(3).Title.String = ['slice - ', num2str(gData.iSlice)];;
+
+gData.Panel.View.hImage(4).CData = J;
+gData.Panel.View.hAxis(4).Title.String = ['slice - ', num2str(gData.iSlice+gData.SliceD)];;
+
+gData.Panel.View.hQV(4).Visible = 'off';
+
+guidata(hFig, gData);
 
 % startSlice = str2double(data.Panel.Snake.Comp.Edit.StartSlice.String);
 % endSlice = str2double(data.Panel.Snake.Comp.Edit.EndSlice.String);

@@ -24,5 +24,6 @@ gData.Panel.Menu.Comp = addComp2Panel_Menu(gData.Panel.Menu.hPanel);
                         addComp2Panel_View(gData.Panel.View.hPanel);
 
 gData.SliceD = 10;
+gData.iSlice = 1;
 
 guidata(hFig, gData);

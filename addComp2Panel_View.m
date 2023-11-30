@@ -16,10 +16,11 @@ for n = 1:2
         % subPanel(k).Title = 'Sag';
         hSubPanel(k).BackgroundColor = 'k';
 
-        sgl = uigridlayout(hSubPanel(k), [2 1]);
+        sgl = uigridlayout(hSubPanel(k), [3 1]);
         sgl.RowHeight = {'1x', 40};
 
         hAxis(k) = uiaxes(sgl);
+        hAxis(k).Title.String = '';
         hSlider(k) = uislider(sgl,...
                             'Visible', 'off', ...        
                             'ValueChangedFcn', @Callback_Slider_ViewPanel_1);

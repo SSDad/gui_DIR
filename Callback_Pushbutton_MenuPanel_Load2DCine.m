@@ -54,36 +54,35 @@ gData.Panel.View.RAGrid = RAGrid;
 
 iSlice = 1;
 % axis and image
-hA = gData.Panel.View.hAxis(1);
-cla(hA)
-I = cineData.v(:, :, iSlice);
-gData.Panel.View.hImage(1) = imshow(I, RA, [], 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy');
-hold(hA, "on");
 
-hA = gData.Panel.View.hAxis(2);
-cla(hA)
-J = cineData.v(:, :, iSlice+gData.SliceD);
-gData.Panel.View.hImage(2) = imshow(J, RA, [], 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy');
-hold(hA, "on");
-gData.Panel.View.hQV(2) = quiver(hA, [], [], [], [], 'g');
+I{1} = cineData.v(:, :, iSlice);
+I{2} = cineData.v(:, :, iSlice+gData.SliceD);
+I{3} = I{1};
+I{4} = I{2};
 
-hA = gData.Panel.View.hAxis(3);
-cla(hA)
-% K = cineData.v(:, :, iSlice);
-% gData.Panel.View.hImage(3) = imshow(K, RA, [], 'parent', hA);
-% axis(hA, 'tight', 'equal', 'xy');
-% hold(hA, "on")
+TT{1} = ['slice - ', num2str(iSlice)];
+TT{2} = ['slice - ', num2str(iSlice+gData.SliceD)];
+TT{3} = TT{1};
+TT{4} = TT{2};
 
-hA = gData.Panel.View.hAxis(4);
-cla(hA)
+for iA = 1:4
+    hA(iA) = gData.Panel.View.hAxis(iA);
+    cla(hA(iA))
+    gData.Panel.View.hImage(iA) = imshow(I{iA}, RA, [], 'parent', hA(iA));
+    axis(hA(iA), 'tight', 'equal', 'xy');
+    hold(hA(iA), "on");
+    gData.Panel.View.hQV(iA) = quiver(hA(iA), [], [], [], [], 'g');
+
+    hA(iA).Title.String = TT{iA};
+end
 
 % slider
 hSS =  gData.Panel.View.hSlider(1);
 hSS.Limits = [1 nSlice];
 hSS.Value = iSlice;
 hSS.Visible = 'on';
+
+hFig.Name = ['DIR   ', dcmPath];
 
 guidata(hFig, gData);
 

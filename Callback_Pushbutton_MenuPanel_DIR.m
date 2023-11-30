@@ -9,10 +9,11 @@ img_fixed = gData.cineData.v(:,:,iSlice);
 img_moving = gData.cineData.v(:,:,iSlice+gData.SliceD);
 
 [dispField, img_reg]=imregdeform(img_moving, img_fixed);
-
-
-%% view
 gData.Panel.View.hImage(3).CData = img_reg;
+gData.Panel.View.hAxis(3).Title.String = ['Registered'];
+
+gData.Panel.View.hImage(4).CData = img_moving;
+gData.Panel.View.hAxis(4).Title.String = ['Displacement Field'];
 
 RA = gData.Panel.View.RA(1);
 xx = gData.Panel.View.RAGrid.xx;
@@ -27,8 +28,13 @@ V = dispField(:,:,2);
 U = U(1:s:end, 1:s:end);
 V = V(1:s:end, 1:s:end);
 
-hQV = gData.Panel.View.hQV(2);
-set(hQV, 'XData', xg, 'YData', yg, 'UData', U, 'VData', V);
+set(gData.Panel.View.hQV(4), 'XData', xg+U, 'YData', yg+V, 'UData', -U, 'VData', -V);
+gData.Panel.View.hQV(4).Visible = 'on';
+
+guidata(hFig, gData);
+
+% quiver(hA4, xg+U, yg+V, -U, -V, 'r', 'AutoScale', 'off');
+
 
 % 
 % 
