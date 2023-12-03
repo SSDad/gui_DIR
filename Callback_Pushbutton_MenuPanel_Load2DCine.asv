@@ -57,15 +57,26 @@ iSlice = 1;
 
 I{1} = cineData.v(:, :, iSlice);
 I{2} = cineData.v(:, :, iSlice+gData.SliceD);
-I{3} 
+I{3} = I{1};
+I{4} = I{2};
 
-for iA = 1:4
-    hA(iA) = gData.Panel.View.hAxis(1);
+TT{1} = ['Reference - slice  ', num2str(iSlice)];
+TT{2} = ['Moving - slice ', num2str(iSlice+gData.SliceD)];
+TT{3} = 'Reference (red) and moving (green)';
+
+for iA = 1:6
+    hA(iA) = gData.Panel.View.hAxis(iA);
     cla(hA(iA))
     gData.Panel.View.hImage(iA) = imshow(I{iA}, RA, [], 'parent', hA(iA));
     axis(hA(iA), 'tight', 'equal', 'xy');
     hold(hA(iA), "on");
+    
     gData.Panel.View.hQV(iA) = quiver(hA(iA), [], [], [], [], 'g');
+
+    gData.Panel.View.hBB(iA) = line(hA(iA), 'XData', [], 'YData', [], 'Color', 'b');
+    gData.Panel.View.hBB(iA).Visible = 'off';
+
+    hA(iA).Title.String = TT{iA};
 end
 
 % slider
@@ -73,6 +84,8 @@ hSS =  gData.Panel.View.hSlider(1);
 hSS.Limits = [1 nSlice];
 hSS.Value = iSlice;
 hSS.Visible = 'on';
+
+hFig.Name = ['DIR   ', dcmPath];
 
 guidata(hFig, gData);
 

@@ -57,23 +57,46 @@ iSlice = 1;
 
 I{1} = cineData.v(:, :, iSlice);
 I{2} = cineData.v(:, :, iSlice+gData.SliceD);
-I{3} = I{1};
-I{4} = I{2};
 
-TT{1} = ['slice - ', num2str(iSlice)];
-TT{2} = ['slice - ', num2str(iSlice+gData.SliceD)];
-TT{3} = TT{1};
-TT{4} = TT{2};
+TT{1} = ['Reference - slice  ', num2str(iSlice)];
+TT{2} = ['Moving - slice ', num2str(iSlice+gData.SliceD)];
+TT{3} = 'Reference (red) and moving (green)';
 
-for iA = 1:4
+for iA = 1:6
     hA(iA) = gData.Panel.View.hAxis(iA);
     cla(hA(iA))
-    gData.Panel.View.hImage(iA) = imshow(I{iA}, RA, [], 'parent', hA(iA));
     axis(hA(iA), 'tight', 'equal', 'xy');
     hold(hA(iA), "on");
-    gData.Panel.View.hQV(iA) = quiver(hA(iA), [], [], [], [], 'g');
+    
+    gData.Panel.View.hBB(iA) = line(hA(iA), 'XData', [], 'YData', [], 'Color', 'b');
+    gData.Panel.View.hBB(iA).Visible = 'off';
 
+    hA(iA).Title.String = num2str(iA);
+
+end
+
+for iA = 1:2
+    gData.Panel.View.hImage(iA) = imshow(I{iA}, RA, [], 'parent', hA(iA));
     hA(iA).Title.String = TT{iA};
+end
+
+iA = 3;
+C = imfuse(I{1}, I{2});
+gData.Panel.View.hImage(iA) = imshow(C, RA, 'parent', hA(iA));
+% gData.Panel.View.hImage(iA) = imshowpair(I{1}, RA, I{2}, RA, 'parent', hA(iA));
+hA(iA).Title.String = TT{iA};
+
+gData.Panel.View.hImage(4) = imshow(C, RA, 'parent', hA(4));
+gData.Panel.View.hImage(5) = imshow(I{1}, RA, [], 'parent', hA(5));
+gData.Panel.View.hImage(6) = imshow(C, RA, 'parent', hA(6));
+
+gData.Panel.View.hQV(6) = quiver(hA(6), [], [], [], [], 'g');
+
+junk = [4 5 6];
+for n = 1:3
+    iA = junk(n);
+    gData.Panel.View.hImage(iA).CData = [];
+    hA(iA).Title.String = '';
 end
 
 % slider

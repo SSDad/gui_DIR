@@ -9,8 +9,6 @@ fixed = im2gray(fixedImg);
 movingImg = imread("hands2.jpg");
 moving = im2gray(movingImg);
 
-
-
 %% view
 
 RA = imref2d(size(fixed), [0 30], [0 20]);
@@ -20,33 +18,36 @@ RA = imref2d(size(fixed), [0 30], [0 20]);
 hWB = waitbar(0.1, 'Loading images..');
 pause(1)
 
-hA = gData.Panel.View.hAxis(1);
-cla(hA)
-gData.Panel.View.hImage(1) = imshow(fixed, RA, 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy', 'on');
-hold(hA, "on");
+for n = 1:6
+    hA(n) = gData.Panel.View.hAxis(n);
+    cla(hA(n))
+    axis(hA(n), 'tight', 'equal', 'xy', 'on');
+    hold(hA(n), "on");
+end
 
-hA2 = gData.Panel.View.hAxis(2);
-cla(hA2)
-gData.Panel.View.hImage(2) = imshow(moving, RA, 'parent', hA2);
-axis(hA2, 'tight', 'equal', 'xy', 'on');
-hold(hA2, "on");
+gData.Panel.View.hImage(1) = imshow(fixed, RA, 'parent', hA(1));
+hA(1).Title.String = 'Reference';
 
-waitbar(0.5, hWB, 'Registering...');
+gData.Panel.View.hImage(2) = imshow(moving, RA, 'parent', hA(2));
+hA(2).Title.String = 'Moving';
+
+gData.Panel.View.hImage(3) = imshowpair(fixed, RA, moving, RA, 'parent', hA(3));
+hA(3).Title.String = 'Reference and Moving';
+
+waitbar(0.5, hWB, 'Deforming...');
 [dispField, reg] = imregdeform(moving, fixed, NumPyramidLevels=6, GridRegularization=0.6, DisplayProgress=0);
+% [dispField, reg] = imregdeform(fixed, moving, NumPyramidLevels=6, GridRegularization=0.6, DisplayProgress=0);
 
-hA = gData.Panel.View.hAxis(3);
-cla(hA)
-gData.Panel.View.hImage(3) = imshowpair(fixed, RA, reg, RA, 'parent', hA);
-axis(hA, 'tight', 'equal', 'xy', 'on');
-hold(hA, "on");
+n = 5;
+gData.Panel.View.hImage(n) = imshow(reg, RA, 'parent', hA(n));
+hA(n).Title.String = 'Moving Deformed';
 
-hA4 = gData.Panel.View.hAxis(4);
-cla(hA4)
-gData.Panel.View.hImage(4) = imshowpair(fixed, RA, moving, RA,  'parent', hA4);
-axis(hA4, 'tight', 'equal', 'xy', 'on');
-hold(hA4, "on");
+n = 4;
+gData.Panel.View.hImage(n) = imshowpair(fixed, RA, reg, RA, 'parent', hA(n));
+hA(n).Title.String = 'Reference and Deformed';
 
+gData.Panel.View.hImage(6) = imshowpair(reg, RA, moving, RA, 'parent', hA(6));
+hA(6).Title.String = 'DVF';
 
 s = 16;
 dx = RA.PixelExtentInWorldX;
@@ -64,8 +65,9 @@ V = V(1:s:end, 1:s:end);
 
 waitbar(0.9, hWB, 'Drawing displacement field map...');
 pause(1)
-quiver(hA4, xg+U, yg+V, -U, -V, 'r', 'AutoScale', 'off');
-plot(xg+U, yg+V, 'g.', 'MarkerSize', 6, 'parent', hA4)
+% quiver(hA(6), xg+U, yg+V, -U, -V, 'r', 'AutoScale', 'off');
+quiver(hA(6), xg, yg, U, V, 'r', 'AutoScale', 'off');
+plot(xg, yg, 'g.', 'MarkerSize', 6, 'parent', hA(6))
 
 waitbar(1, hWB, 'Done...');
 pause(1)

@@ -8,19 +8,20 @@ gData.iSlice = iSlice;
 
 I = gData.cineData.v(:,:,iSlice);
 gData.Panel.View.hImage(1).CData = I;
-gData.Panel.View.hAxis(1).Title.String = ['slice - ', num2str(gData.iSlice)];
+gData.Panel.View.hAxis(1).Title.String = ['Reference - slice ', num2str(gData.iSlice)];
 
 J = gData.cineData.v(:,:,iSlice+gData.SliceD);
 gData.Panel.View.hImage(2).CData = J;
-gData.Panel.View.hAxis(2).Title.String = ['slice - ', num2str(gData.iSlice+gData.SliceD)];;
+gData.Panel.View.hAxis(2).Title.String = ['Moving - slice ', num2str(gData.iSlice+gData.SliceD)];;
 
-gData.Panel.View.hImage(3).CData = I;
-gData.Panel.View.hAxis(3).Title.String = ['slice - ', num2str(gData.iSlice)];;
+C = imfuse(I, J);
+gData.Panel.View.hImage(3).CData = C;
 
-gData.Panel.View.hImage(4).CData = J;
-gData.Panel.View.hAxis(4).Title.String = ['slice - ', num2str(gData.iSlice+gData.SliceD)];;
+for iA = 4:6
+      gData.Panel.View.hImage(iA).CData = [];
+end
 
-gData.Panel.View.hQV(4).Visible = 'off';
+gData.Panel.View.hQV(6).Visible = 'off';
 
 guidata(hFig, gData);
 

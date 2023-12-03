@@ -9,11 +9,19 @@ img_fixed = gData.cineData.v(:,:,iSlice);
 img_moving = gData.cineData.v(:,:,iSlice+gData.SliceD);
 
 [dispField, img_reg]=imregdeform(img_moving, img_fixed);
-gData.Panel.View.hImage(3).CData = img_reg;
-gData.Panel.View.hAxis(3).Title.String = ['Registered'];
+gData.Panel.View.hImage(5).CData = img_reg;
+gData.Panel.View.hImage(5).Visible = 'on';
+gData.Panel.View.hAxis(5).Title.String = ['Moving Deformed'];
 
-gData.Panel.View.hImage(4).CData = img_moving;
-gData.Panel.View.hAxis(4).Title.String = ['Displacement Field'];
+C = imfuse(img_fixed, img_reg);
+gData.Panel.View.hImage(4).CData = C;
+gData.Panel.View.hImage(4).Visible = 'on';
+gData.Panel.View.hAxis(4).Title.String = ['Reference and Deformed'];
+
+C = imfuse(img_reg, img_moving);
+gData.Panel.View.hImage(6).CData = C;
+gData.Panel.View.hImage(6).Visible = 'on';
+gData.Panel.View.hAxis(6).Title.String = ['DVF'];
 
 RA = gData.Panel.View.RA(1);
 xx = gData.Panel.View.RAGrid.xx;
@@ -23,13 +31,35 @@ xx = xx(1:s:end);
 yy = yy(1:s:end);
 [xg, yg] = meshgrid(xx, yy);
 
-U = dispField(:,:,1);
-V = dispField(:,:,2);
+dx = RA.PixelExtentInWorldX;
+dy = RA.PixelExtentInWorldY;
+U = dispField(:,:,1) * dy;
+V = dispField(:,:,2) * dx;
 U = U(1:s:end, 1:s:end);
 V = V(1:s:end, 1:s:end);
 
-set(gData.Panel.View.hQV(4), 'XData', xg+U, 'YData', yg+V, 'UData', -U, 'VData', -V);
-gData.Panel.View.hQV(4).Visible = 'on';
+% body mask
+J = rescale(img_moving);
+T = graythresh(J);
+BW = imbinarize(J, T/16);
+BW = imfill(BW, 'holes');
+se = strel('disk', 2);
+BW = imerode(BW, se);
+B = bwboundaries(BW);
+nn = B{1}(:, 1);
+mm = B{1}(:, 2);
+[xx, yy] = intrinsicToWorld(RA, mm, nn);
+
+set(gData.Panel.View.hBB(6), 'XData', xx, 'YData', yy);
+
+%% inside polygon
+[ind] = inpolygon(xg, yg, xx, yy);
+U(~ind) = 0;
+V(~ind) = 0;
+
+%% quiver
+set(gData.Panel.View.hQV(6), 'XData', xg+U, 'YData', yg+V, 'UData', -U, 'VData', -V);
+gData.Panel.View.hQV(6).Visible = 'on';
 
 guidata(hFig, gData);
 

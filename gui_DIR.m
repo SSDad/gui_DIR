@@ -1,7 +1,7 @@
 function gui_DIR
 
 %% fig
-xL = 1/2;
+xL = 3/4;
 yL = 3/4;
 x0 = (1-xL)/2;
 y0 = (1-yL)/2;

@@ -3,24 +3,24 @@ function [hSubPanel, hAxis, hSlider] = addComp2Panel_View(hPanel)
 FC = [255 255 102]/255;
 
 %% sag, cor, sag+cor
-gl = uigridlayout(hPanel, [2 2]);
+gl = uigridlayout(hPanel, [2 3]);
 gl.RowHeight = {'1x','1x'};
-gl.ColumnWidth = {'1x','1x'};
+gl.ColumnWidth = {'1x','1x', '1x'};
 
-for n = 1:2
-    for m = 1:2
-        k = m+(n-1)*2;
+for r = 1:2
+    for c = 1:3
+        k = c+(r-1)*3;
         hSubPanel(k) = uipanel(gl);
-        hSubPanel(k).Layout.Row = n;
-        hSubPanel(k).Layout.Column = m;
+        hSubPanel(k).Layout.Row = r;
+        hSubPanel(k).Layout.Column = c;
         % subPanel(k).Title = 'Sag';
         hSubPanel(k).BackgroundColor = 'k';
 
-        sgl = uigridlayout(hSubPanel(k), [3 1]);
+        sgl = uigridlayout(hSubPanel(k), [2 1]);
         sgl.RowHeight = {'1x', 40};
 
         hAxis(k) = uiaxes(sgl);
-        hAxis(k).Title.String = '';
+        hAxis(k).Title.String = [num2str(k)];
         hSlider(k) = uislider(sgl,...
                             'Visible', 'off', ...        
                             'ValueChangedFcn', @Callback_Slider_ViewPanel_1);
